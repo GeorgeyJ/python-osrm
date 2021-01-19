@@ -8,7 +8,7 @@ from geopandas import GeoDataFrame, pd
 from shapely.geometry import MultiPolygon, Polygon, Point
 
 from . import RequestConfig, Point as _Point
-from .core import table
+from . import table
 
 if not matplotlib.get_backend():
     matplotlib.use('Agg')
@@ -79,9 +79,10 @@ def contour_poly(gdf, field_name, n_class):
     maxy = np.nanmax(y)
 
     # Assuming we want a square grid for the interpolation
-    xi = np.linspace(minx, maxx, 200)
-    yi = np.linspace(miny, maxy, 200)
-    zi = griddata(x, y, z, xi, yi, interp='linear')
+
+    xi,yi = np.mgrid[minx:maxx:200j, miny:maxy:200j]
+
+    zi = griddata( list(zip(x, y)),np.array(z), (xi, yi), method='linear')
 
     interval_time = int(round(np.nanmax(z) / n_class))
     nb_inter = n_class + 1
